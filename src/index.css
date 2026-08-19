@@ -1,0 +1,108 @@
+:root {
+  --clr-primary: #6741d9;
+  --clr-primary-light: #7950f2;
+  --clr-text: #dee2e6;
+  --clr-text-dark: #adb5bd;
+  --clr-background-100: #343a40;
+  --clr-background-500: #2b3035;
+  --clr-background-900: #212529;
+  --clr-red: #fa5252;
+  --clr-red-dark: #e03131;
+
+  --font-family:
+    -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
+    Cantarell, Open Sans, Helvetica Neue, sans-serif;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.3rem;
+  --font-size-xl: 2rem;
+  --font-size-2xl: 4rem;
+
+  --font-weight-md: 600;
+
+  --spacing-min: 10px;
+  --spacing-normal: 1rem;
+}
+
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  width: 100%;
+  height: 100vh;
+  padding: var(--spacing-normal);
+
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-md);
+  color: var(--clr-text);
+
+  background-color: var(--clr-background-900);
+}
+
+.nav-bar {
+  display: flex;
+  flex-direction: column;
+  /* justify-content: space-between; */
+  align-items: center;
+  gap: 0.5rem;
+
+  /* padding: 1rem 3rem; */
+  padding-inline: var(--spacing-min);
+  padding-block: var(--spacing-normal);
+  border-radius: 0.8rem;
+  background-color: var(--clr-primary);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  padding-bottom: 0.5rem;
+  /* background-color: #fa5252; */
+  text-shadow: -2px 2px 2px #0000001a;
+
+  span {
+    font-size: var(--font-size-xl);
+    line-height: 1;
+    transform: translateY(-2px);
+  }
+
+  h1 {
+    line-height: 1;
+  }
+}
+
+.search {
+  all: unset;
+  align-self: stretch;
+  padding: 0.3rem 1rem;
+
+  font-family: var(--font-family);
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-lg);
+  color: var(--clr-text);
+
+  border-radius: 0.3rem;
+  background-color: var(--clr-primary-light);
+  box-shadow: 0 0 2px 1px #0000000e;
+
+  transition: all 300ms;
+}
+
+.search::placeholder {
+  color: var(--clr-text-dark);
+}
+
+.search:focus {
+  /* background-color: #212529; */
+  transform: translateY(-3px);
+  box-shadow: 0px 4px 8px 5px #0000000e;
+}
+
+.num-results {
+  align-self: flex-end;
+}
