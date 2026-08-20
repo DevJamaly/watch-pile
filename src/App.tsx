@@ -64,119 +64,205 @@ const average = (arr: number[]) =>
   arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
 
 function App() {
-  const [query, setQuery] = useState('');
   const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+
+  return (
+    <div className="app">
+      <NavBar movies={movies} />
+      <Main movies={movies} />
+    </div>
+  );
+}
+
+interface NavBarProps {
+  movies: MovieData[];
+}
+
+function NavBar({ movies }: NavBarProps) {
+  return (
+    <nav className="nav-bar">
+      <Logo />
+      <Search />
+      <NumResults movies={movies} />
+    </nav>
+  );
+}
+
+function Logo() {
+  return (
+    <div className="logo">
+      <span role="img">🍿</span>
+      <h1>WatchPile</h1>
+    </div>
+  );
+}
+
+function NumResults({ movies }: NavBarProps) {
+  return (
+    <p className="num-results">
+      Found <strong>{movies.length}</strong> results
+    </p>
+  );
+}
+
+function Search() {
+  const [query, setQuery] = useState('');
+
+  return (
+    <input
+      className="search"
+      type="text"
+      placeholder="Search movies..."
+      value={query}
+      onChange={e => setQuery(e.target.value)}
+    />
+  );
+}
+
+interface MainProps {
+  movies: MovieData[];
+}
+
+function Main({ movies }: MainProps) {
+  return (
+    <main className="main">
+      <ListBox movies={movies} />
+      <WatchedBox />
+    </main>
+  );
+}
+
+function ListBox({ movies }: { movies: MovieData[] }) {
   const [isOpen1, setIsOpen1] = useState(true);
+
+  return (
+    <div className="box">
+      <ViewToggleButton
+        isOpen={isOpen1}
+        onToggle={() => setIsOpen1(open => !open)}
+      />
+      {isOpen1 && <MovieList movies={movies} />}
+    </div>
+  );
+}
+
+interface ViewToggleButtonProps {
+  isOpen: boolean;
+  onToggle: () => void;
+}
+
+function ViewToggleButton({ isOpen, onToggle }: ViewToggleButtonProps) {
+  return (
+    <button className="btn-toggle" data-open={isOpen} onClick={onToggle} />
+  );
+}
+
+function MovieList({ movies }: { movies: MovieData[] }) {
+  return (
+    <ul className="list">
+      {movies?.map(movie => (
+        <Movie movie={movie} key={movie.imdbID} />
+      ))}
+    </ul>
+  );
+}
+
+function Movie({ movie }: { movie: MovieData }) {
+  return (
+    <li>
+      <img src={movie.Poster} alt={`${movie.Title} poster`} />
+      <h3>{movie.Title}</h3>
+      <div>
+        <p>
+          <span>🗓</span>
+          <span>{movie.Year}</span>
+        </p>
+      </div>
+    </li>
+  );
+}
+
+function WatchedBox() {
+  const [watched, setWatched] = useState(tempWatchedData);
+
   const [isOpen2, setIsOpen2] = useState(true);
 
+  return (
+    <div className="box">
+      <ViewToggleButton
+        isOpen={isOpen2}
+        onToggle={() => setIsOpen2(open => !open)}
+      />
+      {isOpen2 && (
+        <>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </>
+      )}
+    </div>
+  );
+}
+
+function WatchedSummary({ watched }: { watched: WatchedData[] }) {
   const avgImdbRating = average(watched.map(movie => movie.imdbRating));
   const avgUserRating = average(watched.map(movie => movie.userRating));
   const avgRuntime = average(watched.map(movie => movie.runtime));
 
   return (
-    <>
-      <nav className="nav-bar">
-        <div className="logo">
-          <span role="img">🍿</span>
-          <h1>WatchPile</h1>
-        </div>
-        <input
-          className="search"
-          type="text"
-          placeholder="Search movies..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
-        <p className="num-results">
-          Found <strong>{movies.length}</strong> results
+    <div className="summary">
+      <h2>Movies you watched</h2>
+      <div>
+        <p>
+          <span>#️⃣</span>
+          <span>{watched.length} movies</span>
         </p>
-      </nav>
+        <p>
+          <span>⭐️</span>
+          <span>{avgImdbRating}</span>
+        </p>
+        <p>
+          <span>🌟</span>
+          <span>{avgUserRating}</span>
+        </p>
+        <p>
+          <span>⏳</span>
+          <span>{avgRuntime} min</span>
+        </p>
+      </div>
+    </div>
+  );
+}
 
-      <main className="main">
-        <div className="box">
-          <button
-            className="btn-toggle"
-            onClick={() => setIsOpen1(open => !open)}
-          >
-            {isOpen1 ? '–' : '+'}
-          </button>
-          {isOpen1 && (
-            <ul className="list">
-              {movies?.map(movie => (
-                <li key={movie.imdbID}>
-                  <img src={movie.Poster} alt={`${movie.Title} poster`} />
-                  <h3>{movie.Title}</h3>
-                  <div>
-                    <p>
-                      <span>🗓</span>
-                      <span>{movie.Year}</span>
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+function WatchedMoviesList({ watched }: { watched: WatchedData[] }) {
+  return (
+    <ul className="list">
+      {watched.map(movie => (
+        <WatchedMovie movie={movie} key={movie.imdbID} />
+      ))}
+    </ul>
+  );
+}
 
-        <div className="box">
-          <button
-            className="btn-toggle"
-            onClick={() => setIsOpen2(open => !open)}
-          >
-            {isOpen2 ? '–' : '+'}
-          </button>
-          {isOpen2 && (
-            <>
-              <div className="summary">
-                <h2>Movies you watched</h2>
-                <div>
-                  <p>
-                    <span>#️⃣</span>
-                    <span>{watched.length} movies</span>
-                  </p>
-                  <p>
-                    <span>⭐️</span>
-                    <span>{avgImdbRating}</span>
-                  </p>
-                  <p>
-                    <span>🌟</span>
-                    <span>{avgUserRating}</span>
-                  </p>
-                  <p>
-                    <span>⏳</span>
-                    <span>{avgRuntime} min</span>
-                  </p>
-                </div>
-              </div>
-
-              <ul className="list">
-                {watched.map(movie => (
-                  <li key={movie.imdbID}>
-                    <img src={movie.Poster} alt={`${movie.Title} poster`} />
-                    <h3>{movie.Title}</h3>
-                    <div>
-                      <p>
-                        <span>⭐️</span>
-                        <span>{movie.imdbRating}</span>
-                      </p>
-                      <p>
-                        <span>🌟</span>
-                        <span>{movie.userRating}</span>
-                      </p>
-                      <p>
-                        <span>⏳</span>
-                        <span>{movie.runtime} min</span>
-                      </p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </>
-          )}
-        </div>
-      </main>
-    </>
+function WatchedMovie({ movie }: { movie: WatchedData }) {
+  return (
+    <li>
+      <img src={movie.Poster} alt={`${movie.Title} poster`} />
+      <h3>{movie.Title}</h3>
+      <div>
+        <p>
+          <span>⭐️</span>
+          <span>{movie.imdbRating}</span>
+        </p>
+        <p>
+          <span>🌟</span>
+          <span>{movie.userRating}</span>
+        </p>
+        <p>
+          <span>⏳</span>
+          <span>{movie.runtime} min</span>
+        </p>
+      </div>
+    </li>
   );
 }
 
