@@ -74,16 +74,16 @@ function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        {/* <Box>
+        <Box>
           <MovieList movies={movies} />
-        </Box> */}
+        </Box>
 
-        {/*  <Box>
+        <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
-        </Box> */}
+        </Box>
 
-        <BoxExplicit elements={<MovieList movies={movies} />} />
+        {/* <BoxExplicit elements={<MovieList movies={movies} />} />
         <BoxExplicit
           elements={
             <>
@@ -91,7 +91,7 @@ function App() {
               <WatchedMoviesList watched={watched} />
             </>
           }
-        />
+        /> */}
       </Main>
     </div>
   );
