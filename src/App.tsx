@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 interface MovieData {
   imdbID: string;
@@ -65,25 +65,36 @@ const average = (arr: number[]) =>
 
 function App() {
   const [movies, setMovies] = useState(tempMovieData);
+  const [watched, setWatched] = useState(tempWatchedData);
 
   return (
     <div className="app">
-      <NavBar movies={movies} />
-      <Main movies={movies} />
+      <NavBar>
+        <Search />
+        <NumResults movies={movies} />
+      </NavBar>
+      <Main>
+        <Box>
+          <MovieList movies={movies} />
+        </Box>
+        <Box>
+          <WatchedSummary watched={watched} />
+          <WatchedMoviesList watched={watched} />
+        </Box>
+      </Main>
     </div>
   );
 }
 
 interface NavBarProps {
-  movies: MovieData[];
+  children: React.ReactNode;
 }
 
-function NavBar({ movies }: NavBarProps) {
+function NavBar({ children }: NavBarProps) {
   return (
     <nav className="nav-bar">
       <Logo />
-      <Search />
-      <NumResults movies={movies} />
+      {children}
     </nav>
   );
 }
@@ -97,7 +108,7 @@ function Logo() {
   );
 }
 
-function NumResults({ movies }: NavBarProps) {
+function NumResults({ movies }: { movies: MovieData[] }) {
   return (
     <p className="num-results">
       Found <strong>{movies.length}</strong> results
@@ -120,28 +131,23 @@ function Search() {
 }
 
 interface MainProps {
-  movies: MovieData[];
+  children: React.ReactNode;
 }
 
-function Main({ movies }: MainProps) {
-  return (
-    <main className="main">
-      <ListBox movies={movies} />
-      <WatchedBox />
-    </main>
-  );
+function Main({ children }: MainProps) {
+  return <main className="main">{children}</main>;
 }
 
-function ListBox({ movies }: { movies: MovieData[] }) {
-  const [isOpen1, setIsOpen1] = useState(true);
+function Box({ children }: { children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(true);
 
   return (
     <div className="box">
       <ViewToggleButton
-        isOpen={isOpen1}
-        onToggle={() => setIsOpen1(open => !open)}
+        isOpen={isOpen}
+        onToggle={() => setIsOpen(open => !open)}
       />
-      {isOpen1 && <MovieList movies={movies} />}
+      {isOpen && children}
     </div>
   );
 }
@@ -179,27 +185,6 @@ function Movie({ movie }: { movie: MovieData }) {
         </p>
       </div>
     </li>
-  );
-}
-
-function WatchedBox() {
-  const [watched, setWatched] = useState(tempWatchedData);
-
-  const [isOpen2, setIsOpen2] = useState(true);
-
-  return (
-    <div className="box">
-      <ViewToggleButton
-        isOpen={isOpen2}
-        onToggle={() => setIsOpen2(open => !open)}
-      />
-      {isOpen2 && (
-        <>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
-        </>
-      )}
-    </div>
   );
 }
 
