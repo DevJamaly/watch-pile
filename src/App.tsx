@@ -74,13 +74,24 @@ function App() {
         <NumResults movies={movies} />
       </NavBar>
       <Main>
-        <Box>
+        {/* <Box>
           <MovieList movies={movies} />
-        </Box>
-        <Box>
+        </Box> */}
+
+        {/*  <Box>
           <WatchedSummary watched={watched} />
           <WatchedMoviesList watched={watched} />
-        </Box>
+        </Box> */}
+
+        <BoxExplicit elements={<MovieList movies={movies} />} />
+        <BoxExplicit
+          elements={
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedMoviesList watched={watched} />
+            </>
+          }
+        />
       </Main>
     </div>
   );
@@ -148,6 +159,20 @@ function Box({ children }: { children: React.ReactNode }) {
         onToggle={() => setIsOpen(open => !open)}
       />
       {isOpen && children}
+    </div>
+  );
+}
+
+function BoxExplicit({ elements }: { elements: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(true);
+
+  return (
+    <div className="box">
+      <ViewToggleButton
+        isOpen={isOpen}
+        onToggle={() => setIsOpen(open => !open)}
+      />
+      {isOpen && elements}
     </div>
   );
 }
