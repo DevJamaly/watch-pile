@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface MovieData {
   imdbID: string;
@@ -60,12 +60,33 @@ const tempWatchedData: WatchedData[] = [
   },
 ];
 
+interface OmdbSearchResponse {
+  Search?: MovieData[]; // "?" = might be missing
+  Response: 'True' | 'False';
+  Error?: string;
+}
+
 const average = (arr: number[]) =>
   arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
 
+const KEY = 'b80fa192';
+const query = 'interstellar';
+
 function App() {
-  const [movies, setMovies] = useState(tempMovieData);
-  const [watched, setWatched] = useState(tempWatchedData);
+  const [movies, setMovies] = useState<MovieData[]>([]);
+  const [watched, setWatched] = useState<WatchedData[]>([]);
+
+  useEffect(() => {
+    async function fetchMovies() {
+      const res = await fetch(
+        `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+      );
+      const data: OmdbSearchResponse = await res.json();
+      setMovies(data.Search ?? []); // missing? use empty array
+    }
+
+    fetchMovies();
+  }, []);
 
   return (
     <div className="app">
