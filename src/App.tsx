@@ -70,18 +70,37 @@ const average = (arr: number[]) =>
   arr.reduce((acc, cur, _, arr) => acc + cur / arr.length, 0);
 
 const KEY = 'b80fa192';
-const query = 'b80fa192';
+const tempQuery = 'interstellar';
 
 function App() {
+  const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<MovieData[]>([]);
   const [watched, setWatched] = useState<WatchedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
+  /* useEffect(function () {
+    console.log(`After initial render`);
+  }, []);
+
+  useEffect(function () {
+    console.log(`After every render`);
+  });
+
+  console.log('During render');
+
+  useEffect(
+    function () {
+      console.log('D');
+    },
+    [query],
+  ); */
+
   useEffect(() => {
     async function fetchMovies() {
       try {
         setIsLoading(true);
+        setError('');
         const res = await fetch(
           `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
         );
@@ -105,13 +124,19 @@ function App() {
       }
     }
 
+    if (query.length < 3) {
+      setMovies([]);
+      setError('');
+      setIsLoading(false);
+      return;
+    }
     fetchMovies();
-  }, []);
+  }, [query]);
 
   return (
     <div className="app">
       <NavBar>
-        <Search />
+        <Search query={query} setQuery={setQuery} />
         <NumResults movies={movies} />
       </NavBar>
       <Main>
@@ -182,9 +207,12 @@ function NumResults({ movies }: { movies: MovieData[] }) {
   );
 }
 
-function Search() {
-  const [query, setQuery] = useState('');
+interface SearchProps {
+  query: string;
+  setQuery: (q: string) => void;
+}
 
+function Search({ query, setQuery }: SearchProps) {
   return (
     <input
       className="search"
