@@ -393,10 +393,108 @@ interface MovieDetailsProps {
   selectedId: string;
   onCloseMovie: () => void;
 }
+
+interface OmdbApiMovie {
+  Response: 'True';
+  Title: string;
+  Year: string;
+  Poster: string;
+  Runtime: string;
+  imdbRating: string;
+  Plot: string;
+  Released: string;
+  Actors: string;
+  Director: string;
+  Genre: string;
+}
+
+interface OmdbApiFailure {
+  Response: 'False';
+  Error: string;
+}
+
+type OmdbResponse = OmdbApiMovie | OmdbApiFailure;
+
+interface Movie {
+  title: string;
+  year: string;
+  poster: string;
+  runtime: number; // parsed, not "148 min"
+  imdbRating: number; // parsed, not "7.7"
+  plot: string;
+  released: string;
+  actors: string[]; // split, not "A, B, C"
+  director: string;
+  genre: string[];
+}
+
+function toMovie(raw: OmdbApiMovie): Movie {
+  return {
+    title: raw.Title,
+    year: raw.Year,
+    poster: raw.Poster,
+    runtime: parseInt(raw.Runtime),
+    imdbRating: parseFloat(raw.imdbRating),
+    plot: raw.Plot,
+    released: raw.Released,
+    actors: raw.Actors.split(', '),
+    director: raw.Director,
+    genre: raw.Genre.split(', '),
+  };
+}
+
 function MovieDetails({ selectedId, onCloseMovie }: MovieDetailsProps) {
-  return (
+  const [movie, setMovie] = useState<Movie | null>(null);
+  const [error, setError] = useState('');
+
+  useEffect(
+    function () {
+      async function fetchMovie() {
+        try {
+          const res = await fetch(
+            `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`,
+          );
+          if (!res.ok)
+            throw new Error('Something went wrong with fetching movies');
+
+          const data: OmdbResponse = await res.json();
+          if (data.Response === 'False') throw new Error(data.Error); // data is OmdbApiFailure here — TS knows it, so .Error is guaranteed to exist
+
+          const mov = toMovie(data);
+          setMovie(mov); // data is OmdbApiMovie here — TS narrowed it after the check above
+        } catch (error) {
+          if (error instanceof Error) {
+            setError(error.message);
+          } else {
+            console.error(`Something went wrong: `, error);
+          }
+        }
+      }
+
+      fetchMovie();
+    },
+    [selectedId],
+  );
+
+  return error ? (
+    <ErrorMessage message={error} />
+  ) : (
     <div className="details">
-      <button className="btn-back" onClick={onCloseMovie} />
+      <header>
+        <button className="btn-back" onClick={onCloseMovie} />
+        <img src={movie?.poster} alt={`Poster of ${movie?.title} movie`} />
+        <div className="details-overview">
+          <h2>{movie?.title}</h2>
+          <p>
+            {movie?.released} &bull; {movie?.runtime}
+          </p>
+          <p>{movie?.genre}</p>
+          <p>
+            <span>⭐</span>
+            {movie?.imdbRating} IMDb rating
+          </p>
+        </div>
+      </header>
       {selectedId}
     </div>
   );
