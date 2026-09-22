@@ -78,6 +78,15 @@ function App() {
   const [watched, setWatched] = useState<WatchedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [selectedId, setSelectedId] = useState<string>('');
+
+  function handleSelectMovie(id: string) {
+    setSelectedId(prevId => (prevId === id ? '' : id));
+  }
+
+  function handleCloseMovie() {
+    setSelectedId('');
+  }
 
   /* useEffect(function () {
     console.log(`After initial render`);
@@ -142,13 +151,24 @@ function App() {
       <Main>
         <Box>
           {isLoading && <Loader />}
-          {!isLoading && !error && <MovieList movies={movies} />}
+          {!isLoading && !error && (
+            <MovieList movies={movies} onSelectMovie={handleSelectMovie} />
+          )}
           {error && <ErrorMessage message={error} />}
         </Box>
 
         <Box>
-          <WatchedSummary watched={watched} />
-          <WatchedMoviesList watched={watched} />
+          {selectedId ? (
+            <MovieDetails
+              selectedId={selectedId}
+              onCloseMovie={handleCloseMovie}
+            />
+          ) : (
+            <>
+              <WatchedSummary watched={watched} />
+              <WatchedMoviesList watched={watched} />
+            </>
+          )}
         </Box>
 
         {/* <BoxExplicit elements={<MovieList movies={movies} />} />
@@ -271,19 +291,29 @@ function ViewToggleButton({ isOpen, onToggle }: ViewToggleButtonProps) {
   );
 }
 
-function MovieList({ movies }: { movies: MovieData[] }) {
+interface MovieListProps {
+  movies: MovieData[];
+  onSelectMovie: (id: string) => void;
+}
+
+function MovieList({ movies, onSelectMovie }: MovieListProps) {
   return (
-    <ul className="list">
+    <ul className="list list-movies">
       {movies?.map(movie => (
-        <Movie movie={movie} key={movie.imdbID} />
+        <Movie movie={movie} key={movie.imdbID} onSelectMovie={onSelectMovie} />
       ))}
     </ul>
   );
 }
 
-function Movie({ movie }: { movie: MovieData }) {
+interface MovieProps {
+  movie: MovieData;
+  onSelectMovie: (id: string) => void;
+}
+
+function Movie({ movie, onSelectMovie }: MovieProps) {
   return (
-    <li>
+    <li onClick={() => onSelectMovie(movie.imdbID)}>
       <img src={movie.Poster} alt={`${movie.Title} poster`} />
       <h3>{movie.Title}</h3>
       <div>
@@ -356,6 +386,19 @@ function WatchedMovie({ movie }: { movie: WatchedData }) {
         </p>
       </div>
     </li>
+  );
+}
+
+interface MovieDetailsProps {
+  selectedId: string;
+  onCloseMovie: () => void;
+}
+function MovieDetails({ selectedId, onCloseMovie }: MovieDetailsProps) {
+  return (
+    <div className="details">
+      <button className="btn-back" onClick={onCloseMovie} />
+      {selectedId}
+    </div>
   );
 }
 
