@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import StarRating from './StarRating';
 
 interface MovieData {
   imdbID: string;
@@ -158,6 +159,11 @@ function App() {
         </Box>
 
         <Box>
+          {/* <MovieDetails
+            selectedId={`tt1375666`}
+            onCloseMovie={handleCloseMovie}
+          /> */}
+
           {selectedId ? (
             <MovieDetails
               selectedId={selectedId}
@@ -423,9 +429,9 @@ interface Movie {
   imdbRating: number; // parsed, not "7.7"
   plot: string;
   released: string;
-  actors: string[]; // split, not "A, B, C"
+  actors: string;
   director: string;
-  genre: string[];
+  genre: string;
 }
 
 function toMovie(raw: OmdbApiMovie): Movie {
@@ -437,20 +443,23 @@ function toMovie(raw: OmdbApiMovie): Movie {
     imdbRating: parseFloat(raw.imdbRating),
     plot: raw.Plot,
     released: raw.Released,
-    actors: raw.Actors.split(', '),
+    actors: raw.Actors,
     director: raw.Director,
-    genre: raw.Genre.split(', '),
+    genre: raw.Genre,
   };
 }
 
 function MovieDetails({ selectedId, onCloseMovie }: MovieDetailsProps) {
   const [movie, setMovie] = useState<Movie | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(
     function () {
       async function fetchMovie() {
         try {
+          setIsLoading(true);
+          setError('');
           const res = await fetch(
             `https://www.omdbapi.com/?apikey=${KEY}&i=${selectedId}`,
           );
@@ -462,6 +471,7 @@ function MovieDetails({ selectedId, onCloseMovie }: MovieDetailsProps) {
 
           const mov = toMovie(data);
           setMovie(mov); // data is OmdbApiMovie here — TS narrowed it after the check above
+          setIsLoading(false);
         } catch (error) {
           if (error instanceof Error) {
             setError(error.message);
@@ -475,27 +485,51 @@ function MovieDetails({ selectedId, onCloseMovie }: MovieDetailsProps) {
     },
     [selectedId],
   );
-
-  return error ? (
-    <ErrorMessage message={error} />
-  ) : (
+  return (
     <div className="details">
-      <header>
-        <button className="btn-back" onClick={onCloseMovie} />
-        <img src={movie?.poster} alt={`Poster of ${movie?.title} movie`} />
-        <div className="details-overview">
-          <h2>{movie?.title}</h2>
-          <p>
-            {movie?.released} &bull; {movie?.runtime}
-          </p>
-          <p>{movie?.genre}</p>
-          <p>
-            <span>⭐</span>
-            {movie?.imdbRating} IMDb rating
-          </p>
-        </div>
-      </header>
-      {selectedId}
+      {isLoading && <Loader />}
+      {!isLoading && !error && (
+        <>
+          <header>
+            <button className="btn-back" onClick={onCloseMovie} />
+            <div className="details-poster-wrap">
+              <img
+                className="details-poster"
+                src={movie?.poster}
+                alt={`Poster of ${movie?.title} movie`}
+              />
+            </div>
+            <div className="details-overview">
+              <h2>{movie?.title}</h2>
+              <p>
+                {movie?.released} &bull; {movie?.runtime}
+              </p>
+              <p>{movie?.genre}</p>
+              <p>
+                <span>⭐</span>
+                {movie?.imdbRating} IMDb rating
+              </p>
+            </div>
+          </header>
+          <section>
+            <div className="rating">
+              <StarRating maxRating={10} size={28} />
+            </div>
+            <p>
+              <em>{movie?.plot}</em>
+            </p>
+            <p>
+              <b>Starring: </b>
+              {movie?.actors}
+            </p>
+            <p>
+              <b>Directed by: </b>
+              {movie?.director}
+            </p>
+          </section>
+        </>
+      )}
+      {error && <ErrorMessage message={error} />}
     </div>
   );
 }
