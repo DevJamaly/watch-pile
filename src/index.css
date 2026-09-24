@@ -441,3 +441,47 @@ body {
   margin-bottom: 0.8rem;
   padding: 2rem 2.4rem;
 }
+
+.btn-add {
+  width: 100%;
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-lg);
+  color: var(--clr-text);
+  padding: var(--spacing-min);
+
+  cursor: pointer;
+  border: none;
+  border-radius: 10rem;
+  background-color: var(--clr-primary);
+}
+
+.btn-delete {
+  position: relative; /* anchor for the pseudo-elements */
+  margin-left: auto;
+  width: 1rem;
+  aspect-ratio: 1; /* keeps it a perfect circle */
+  border: none;
+  border-radius: 50%;
+  background-color: var(--clr-red-dark);
+  cursor: pointer;
+}
+
+.btn-delete::before,
+.btn-delete::after {
+  content: ''; /* required, or pseudo-elements don't render */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 55%; /* length of each bar, relative to the button */
+  height: 2px; /* thickness of the X */
+  background-color: white;
+  border-radius: 1px; /* soft ends */
+}
+
+.btn-delete::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+
+.btn-delete::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
