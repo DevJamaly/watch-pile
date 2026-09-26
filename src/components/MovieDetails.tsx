@@ -45,7 +45,7 @@ function MovieDetails({
   }
 
   useEffect(
-    function () {
+    function getMovie() {
       async function fetchMovie() {
         try {
           setIsLoading(true);

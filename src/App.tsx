@@ -57,12 +57,15 @@ function App() {
   ); */
 
   useEffect(() => {
+    const controller = new AbortController();
+
     async function fetchMovies() {
       try {
         setIsLoading(true);
         setError('');
         const res = await fetch(
           `https://www.omdbapi.com/?apikey=${KEY}&s=${query}`,
+          { signal: controller.signal },
         );
 
         if (!res.ok)
@@ -71,11 +74,10 @@ function App() {
         const data: OmdbSearchResponse = await res.json();
         if (data.Response === 'False') throw new Error(data.Error);
         setMovies(data.Search ?? []); // missing? use empty array
-        setIsLoading(false);
-        console.log(data);
+        setError('');
       } catch (error) {
         if (error instanceof Error) {
-          setError(error.message);
+          if (error.name !== 'AbortError') setError(error.message);
         } else {
           console.error('Something went wrong:', error);
         }
@@ -90,7 +92,13 @@ function App() {
       setIsLoading(false);
       return;
     }
+
     fetchMovies();
+
+    return function cleanUp() {
+      console.log(`Aborting Request ${query}`);
+      controller.abort();
+    };
   }, [query]);
 
   return (
