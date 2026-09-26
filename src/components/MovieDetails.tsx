@@ -19,13 +19,14 @@ function MovieDetails({
   onCloseMovie,
   onAddWatched,
 }: MovieDetailsProps) {
-  const watchedMovie = watched.find(movie => movie.imdbID === selectedId);
-  const isWatched = watchedMovie !== undefined;
-
   const [movie, setMovie] = useState<MovieDetailsData | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [userRating, setUserRating] = useState<number>(0);
+
+  const watchedMovie = watched.find(movie => movie.imdbID === selectedId);
+  const isWatched = watchedMovie !== undefined;
+  const title = movie?.title;
 
   function handleAdd() {
     if (!movie) return;
@@ -41,10 +42,6 @@ function MovieDetails({
 
     onAddWatched(newWatchedMovie);
     onCloseMovie();
-  }
-
-  function handleRating(rating: number) {
-    console.log(rating);
   }
 
   useEffect(
@@ -77,6 +74,19 @@ function MovieDetails({
       fetchMovie();
     },
     [selectedId],
+  );
+
+  useEffect(
+    function setTitle() {
+      if (!title) return;
+      document.title = `MOVIE | ${title}`;
+
+      return function cleanup() {
+        document.title = 'watch-pile';
+        console.log(`Cleanup Effect for movie ${title}`);
+      };
+    },
+    [title],
   );
 
   return (
