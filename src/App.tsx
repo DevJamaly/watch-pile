@@ -93,6 +93,7 @@ function App() {
       return;
     }
 
+    handleCloseMovie();
     fetchMovies();
 
     return function cleanUp() {

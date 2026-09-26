@@ -83,11 +83,25 @@ function MovieDetails({
 
       return function cleanup() {
         document.title = 'watch-pile';
-        console.log(`Cleanup Effect for movie ${title}`);
+        // console.log(`Cleanup Effect for movie ${title}`);
       };
     },
     [title],
   );
+
+  useEffect(() => {
+    function handleEscPress(e: KeyboardEvent) {
+      if (e.code === 'Escape') {
+        onCloseMovie();
+      }
+    }
+
+    document.addEventListener('keydown', handleEscPress);
+
+    return function cleanUp() {
+      document.removeEventListener('keydown', handleEscPress);
+    };
+  }, [onCloseMovie]);
 
   return (
     <div className="details">
