@@ -36,6 +36,16 @@ function MovieDetails({
   //   return <p>Greatest ever ! </p>;
   // }
 
+  // const [isTop, setIsTop] = useState(movie && movie.imdbRating > 8);
+  // console.log(isTop);
+
+  // useEffect(() => {
+  //   setIsTop(movie && movie?.imdbRating > 8);
+  // }, [movie?.imdbRating]);
+
+  const isTop = movie && movie.imdbRating > 8;
+  console.log(isTop);
+
   function handleAdd() {
     if (!movie) return;
     const newWatchedMovie: WatchedData = {
