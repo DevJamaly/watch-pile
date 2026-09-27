@@ -28,6 +28,14 @@ function MovieDetails({
   const isWatched = watchedMovie !== undefined;
   const title = movie?.title;
 
+  // if (movie && movie.imdbRating > 8) {
+  //   const [isTop, setIsTop] = useState(true);
+  // }
+
+  // if (movie && movie.imdbRating > 8) {
+  //   return <p>Greatest ever ! </p>;
+  // }
+
   function handleAdd() {
     if (!movie) return;
     const newWatchedMovie: WatchedData = {

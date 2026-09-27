@@ -39,6 +39,23 @@ function App() {
     setWatched(watched => watched.filter(movie => movie.imdbID !== id));
   }
 
+  /* useEffect(function () {
+    console.log(`After initial render`);
+  }, []);
+
+  useEffect(function () {
+    console.log(`After every render`);
+  });
+
+  console.log('During render');
+
+  useEffect(
+    function () {
+      console.log('D');
+    },
+    [query],
+  ); */
+
   useEffect(() => {
     const controller = new AbortController();
 
