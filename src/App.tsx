@@ -16,10 +16,20 @@ import WatchedMoviesList from './components/WatchedMoviesList';
 function App() {
   const [query, setQuery] = useState('');
   const [movies, setMovies] = useState<MovieData[]>([]);
-  const [watched, setWatched] = useState<WatchedData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [selectedId, setSelectedId] = useState<string>('');
+  // const [watched, setWatched] = useState<WatchedData[]>([]);
+  const [watched, setWatched] = useState<WatchedData[]>(
+    function getWatchedData(): WatchedData[] {
+      try {
+        const storedValue = localStorage.getItem('watched');
+        return storedValue ? JSON.parse(storedValue) : [];
+      } catch {
+        return [];
+      }
+    },
+  );
 
   function handleSelectMovie(id: string) {
     setSelectedId(prevId => (prevId === id ? '' : id));
@@ -33,6 +43,7 @@ function App() {
     if (watched.find(watchedMovie => watchedMovie.imdbID === movie.imdbID))
       return;
     setWatched(watched => [...watched, movie]);
+    // localStorage.setItem('watched', JSON.stringify([...watched, movie]));
   }
 
   function handleDeleteWatchedMovie(id: string) {
@@ -85,6 +96,10 @@ function App() {
     };
   }, [query]);
 
+  useEffect(() => {
+    localStorage.setItem('watched', JSON.stringify(watched));
+  }, [watched]);
+
   return (
     <div className="app">
       <NavBar>
@@ -101,11 +116,6 @@ function App() {
         </Box>
 
         <Box>
-          {/* <MovieDetails
-            selectedId={`tt1375666`}
-            onCloseMovie={handleCloseMovie}
-          /> */}
-
           {selectedId ? (
             <MovieDetails
               selectedId={selectedId}
@@ -123,16 +133,6 @@ function App() {
             </>
           )}
         </Box>
-
-        {/* <BoxExplicit elements={<MovieList movies={movies} />} />
-        <BoxExplicit
-          elements={
-            <>
-              <WatchedSummary watched={watched} />
-              <WatchedMoviesList watched={watched} />
-            </>
-          }
-        /> */}
       </Main>
     </div>
   );

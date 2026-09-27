@@ -28,7 +28,7 @@ function MovieDetails({
   const isWatched = watchedMovie !== undefined;
   const title = movie?.title;
 
-  // if (movie && movie.imdbRating > 8) {
+  /*   // if (movie && movie.imdbRating > 8) {
   //   const [isTop, setIsTop] = useState(true);
   // }
 
@@ -41,7 +41,7 @@ function MovieDetails({
 
   // useEffect(() => {
   //   setIsTop(movie && movie?.imdbRating > 8);
-  // }, [movie?.imdbRating]);
+  // }, [movie?.imdbRating]); */
 
   const isTop = movie && movie.imdbRating > 8;
   console.log(isTop);
