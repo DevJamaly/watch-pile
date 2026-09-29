@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MovieDetailsData, OmdbResponse, WatchedData } from '../types';
 import { toMovie } from '../utils';
 import ErrorMessage from './ErrorMessage';
@@ -24,11 +24,15 @@ function MovieDetails({
   const [error, setError] = useState('');
   const [userRating, setUserRating] = useState<number>(0);
 
+  const countRef = useRef(0);
+
   const watchedMovie = watched.find(movie => movie.imdbID === selectedId);
   const isWatched = watchedMovie !== undefined;
   const title = movie?.title;
 
-  /*   // if (movie && movie.imdbRating > 8) {
+  /*   
+  
+  // if (movie && movie.imdbRating > 8) {
   //   const [isTop, setIsTop] = useState(true);
   // }
 
@@ -41,10 +45,13 @@ function MovieDetails({
 
   // useEffect(() => {
   //   setIsTop(movie && movie?.imdbRating > 8);
-  // }, [movie?.imdbRating]); */
+  // }, [movie?.imdbRating]); 
+  // 
 
-  const isTop = movie && movie.imdbRating > 8;
-  console.log(isTop);
+  // const isTop = movie && movie.imdbRating > 8;
+  // console.log(isTop);
+  
+  */
 
   function handleAdd() {
     if (!movie) return;
@@ -56,6 +63,7 @@ function MovieDetails({
       runtime: movie.runtime,
       imdbRating: movie.imdbRating,
       userRating,
+      countRatingDecisions: countRef.current,
     };
 
     onAddWatched(newWatchedMovie);
@@ -120,6 +128,10 @@ function MovieDetails({
       document.removeEventListener('keydown', handleEscPress);
     };
   }, [onCloseMovie]);
+
+  useEffect(() => {
+    if (userRating) countRef.current += 1;
+  }, [userRating]);
 
   return (
     <div className="details">

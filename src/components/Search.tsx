@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 
 interface SearchProps {
   query: string;
@@ -6,7 +6,7 @@ interface SearchProps {
 }
 
 function Search({ query, setQuery }: SearchProps) {
-  // Don't focus via document.querySelector here. It searches the whole page, so
+  /* // Don't focus via document.querySelector here. It searches the whole page, so
   // multiple instances or another '.search' class focus the wrong element. It
   // ties behaviour to a CSS class name, so a rename breaks focus silently. The
   // <HTMLInputElement> generic is a cast, not a check. With [] deps it runs once,
@@ -17,7 +17,27 @@ function Search({ query, setQuery }: SearchProps) {
     if (!el) return;
     console.log(el);
     el.focus();
-  }, []);
+  }, []); */
+
+  const searchInput = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    function handleEnterPress(e: KeyboardEvent) {
+      if (document.activeElement === searchInput.current) return;
+
+      if (e.code === 'Enter') {
+        console.log(`You have PRESSED the Enter Key`);
+        searchInput.current?.focus();
+        setQuery('');
+      }
+    }
+
+    document.addEventListener('keydown', handleEnterPress);
+
+    return function cleanUp() {
+      document.removeEventListener('keydown', handleEnterPress);
+    };
+  }, [setQuery]);
 
   return (
     <input
@@ -26,6 +46,7 @@ function Search({ query, setQuery }: SearchProps) {
       placeholder="Search movies..."
       value={query}
       onChange={e => setQuery(e.target.value)}
+      ref={searchInput}
     />
   );
 }

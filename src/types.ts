@@ -33,6 +33,7 @@ export interface WatchedData extends MovieData {
   runtime: number;
   imdbRating: number;
   userRating: number;
+  countRatingDecisions?: number;
 }
 
 export const tempWatchedData: WatchedData[] = [
