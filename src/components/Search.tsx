@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+import { useKey } from '../hooks/useKey';
 
 interface SearchProps {
   query: string;
@@ -21,23 +22,11 @@ function Search({ query, setQuery }: SearchProps) {
 
   const searchInput = useRef<HTMLInputElement>(null);
 
-  useEffect(() => {
-    function handleEnterPress(e: KeyboardEvent) {
-      if (document.activeElement === searchInput.current) return;
-
-      if (e.code === 'Enter') {
-        console.log(`You have PRESSED the Enter Key`);
-        searchInput.current?.focus();
-        setQuery('');
-      }
-    }
-
-    document.addEventListener('keydown', handleEnterPress);
-
-    return function cleanUp() {
-      document.removeEventListener('keydown', handleEnterPress);
-    };
-  }, [setQuery]);
+  useKey('Enter', () => {
+    if (document.activeElement === searchInput.current) return;
+    searchInput.current?.focus();
+    setQuery('');
+  });
 
   return (
     <input

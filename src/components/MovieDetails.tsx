@@ -5,6 +5,7 @@ import ErrorMessage from './ErrorMessage';
 import Loader from './Loader';
 import StarRating from './StarRating';
 import { KEY } from '../config';
+import { useKey } from '../hooks/useKey';
 
 interface MovieDetailsProps {
   selectedId: string;
@@ -70,6 +71,8 @@ function MovieDetails({
     onCloseMovie();
   }
 
+  useKey('Escape', onCloseMovie);
+
   useEffect(
     function getMovie() {
       async function fetchMovie() {
@@ -114,20 +117,6 @@ function MovieDetails({
     },
     [title],
   );
-
-  useEffect(() => {
-    function handleEscPress(e: KeyboardEvent) {
-      if (e.code === 'Escape') {
-        onCloseMovie();
-      }
-    }
-
-    document.addEventListener('keydown', handleEscPress);
-
-    return function cleanUp() {
-      document.removeEventListener('keydown', handleEscPress);
-    };
-  }, [onCloseMovie]);
 
   useEffect(() => {
     if (userRating) countRef.current += 1;
